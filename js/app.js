@@ -104,10 +104,15 @@ const TYPE_LABELS = {
 const $ = (sel) => document.querySelector(sel);
 
 const els = {
-  playerLevelBadge: $("#player-level-badge"),
-  playerTitle: $("#player-title"),
-  playerXpFill: $("#player-xp-fill"),
-  playerXpLabel: $("#player-xp-label"),
+  profileHandle: $("#profile-handle"),
+  sceneDino: $("#scene-dino"),
+  scenePct: $("#scene-pct"),
+  sceneLevel: $("#scene-level"),
+  sceneTrackFill: $("#scene-track-fill"),
+  statTasks: $("#stat-tasks"),
+  statJoined: $("#stat-joined"),
+  statHosted: $("#stat-hosted"),
+  statXp: $("#stat-xp"),
   taskForm: $("#task-form"),
   taskTitle: $("#task-title"),
   taskSubject: $("#task-subject"),
@@ -117,18 +122,37 @@ const els = {
   taskEmpty: $("#task-empty"),
   weekProgressText: $("#week-progress-text"),
   weekProgressFill: $("#week-progress-fill"),
-  statJoined: $("#stat-joined"),
-  statHosted: $("#stat-hosted"),
-  statXp: $("#stat-xp"),
   hostForm: $("#host-form"),
   hostTitle: $("#host-title"),
   eventList: $("#event-list"),
   leaderboard: $("#leaderboard"),
-  toast: $("#toast"),
+  notifList: $("#notif-list"),
   confettiLayer: $("#confetti-layer"),
 };
 
 let taskFilter = "all";
+
+// ---------- pixel headings: alternate letter colours ----------
+
+function pixelifyHeadings() {
+  document.querySelectorAll(".pixel-alt").forEach((el) => {
+    const [a, b] = (el.dataset.alt || "pink,blue").split(",");
+    const text = el.textContent;
+    el.textContent = "";
+    let i = 0;
+    for (const ch of text) {
+      if (ch === " ") {
+        el.append(" ");
+        continue;
+      }
+      const span = document.createElement("span");
+      span.className = i % 2 === 0 ? `alt-${a}` : `alt-${b}`;
+      span.textContent = ch;
+      el.append(span);
+      i++;
+    }
+  });
+}
 
 // ---------- XP helpers ----------
 
@@ -141,10 +165,10 @@ function awardXp(amount, reason) {
   renderStats();
   renderLeaderboard();
   if (after > before) {
-    showToast(`🎉 LEVEL UP! You're now Lv ${after} — ${titleForLevel(after)}`);
+    pushNotif("green", "🎉", "LEVEL UP!", `You're now Lv ${after} — ${titleForLevel(after)}`);
     burstConfetti();
   } else if (reason) {
-    showToast(`+${amount} XP · ${reason}`);
+    pushNotif("blue", "⭐", `+${amount} XP`, reason);
   }
 }
 
@@ -161,10 +185,14 @@ function removeXp(amount) {
 function renderPlayer() {
   const level = levelFromXp(state.xp);
   const into = levelProgress(state.xp);
-  els.playerLevelBadge.textContent = `Lv ${level}`;
-  els.playerTitle.textContent = titleForLevel(level);
-  els.playerXpFill.style.width = `${(into / XP_PER_LEVEL) * 100}%`;
-  els.playerXpLabel.textContent = `${into} / ${XP_PER_LEVEL} XP · ${state.xp} total`;
+  const pct = Math.round((into / XP_PER_LEVEL) * 100);
+
+  els.profileHandle.textContent = `@campusquest · Lv ${level}`;
+  els.scenePct.textContent = `${pct}%`;
+  els.sceneLevel.textContent = titleForLevel(level);
+  els.sceneTrackFill.style.width = `${pct}%`;
+  // dino walks from 4% (start of track) towards ~78% (just before the trophy)
+  els.sceneDino.style.left = `calc(4% + ${pct * 0.74}%)`;
 }
 
 function renderTasks() {
@@ -219,6 +247,7 @@ function renderTasks() {
     });
 
   renderWeekProgress();
+  renderStats();
 }
 
 function renderWeekProgress() {
@@ -229,6 +258,7 @@ function renderWeekProgress() {
 }
 
 function renderStats() {
+  els.statTasks.textContent = state.tasks.filter((t) => t.done).length;
   els.statJoined.textContent = state.eventsJoined;
   els.statHosted.textContent = state.eventsHosted;
   els.statXp.textContent = state.xp;
@@ -338,13 +368,58 @@ function renderLeaderboard() {
   });
 }
 
+// ---------- notifications ----------
+
+function pushNotif(color, icon, heading, sub) {
+  const card = document.createElement("div");
+  card.className = `notif notif-${color}`;
+
+  const iconEl = document.createElement("span");
+  iconEl.className = "notif-icon";
+  iconEl.textContent = icon;
+
+  const body = document.createElement("div");
+  body.className = "notif-body";
+  const strong = document.createElement("strong");
+  strong.textContent = heading;
+  body.append(strong);
+  if (sub) {
+    const subEl = document.createElement("span");
+    subEl.className = "notif-sub";
+    subEl.textContent = sub;
+    body.append(subEl);
+  }
+
+  const close = document.createElement("button");
+  close.className = "notif-close";
+  close.textContent = "✕";
+  close.title = "Dismiss";
+  close.addEventListener("click", () => card.remove());
+
+  card.append(iconEl, body, close);
+  els.notifList.prepend(card);
+
+  // keep the panel tidy
+  while (els.notifList.children.length > 7) {
+    els.notifList.lastElementChild.remove();
+  }
+}
+
+function seedNotifs() {
+  pushNotif("peach", "🤘", "Start Your First Challenge",
+    "You're just one step away! Tick off a task to kickstart your journey.");
+  pushNotif("plain", "📒", "Set Up Your Week",
+    "Add your assignments and deadlines to the This Week tab for tailored XP.");
+  pushNotif("blue", "🌟", "Good job on reaching your goal today! 🤙", "");
+}
+
 // ---------- actions ----------
 
 function addTask(title, subject, type, day) {
   state.tasks.push({ id: state.nextId++, title, subject, type, day, done: false });
   saveState();
   renderTasks();
-  showToast("Task added — go get that XP 💪");
+  pushNotif("plain", "📝", "Task added", "Go get that XP 💪");
 }
 
 function toggleTask(id) {
@@ -392,19 +467,10 @@ function hostEvent(name) {
   awardXp(XP_VALUES.hostEvent, `hosting "${name}"`);
 }
 
-// ---------- toast + confetti ----------
-
-let toastTimer = null;
-
-function showToast(msg) {
-  els.toast.textContent = msg;
-  els.toast.classList.remove("hidden");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => els.toast.classList.add("hidden"), 2600);
-}
+// ---------- confetti ----------
 
 function burstConfetti() {
-  const pieces = ["🎉", "⭐", "✨", "🎊", "💜"];
+  const pieces = ["🎉", "⭐", "✨", "🎊", "💙"];
   for (let i = 0; i < 24; i++) {
     const el = document.createElement("span");
     el.className = "confetti";
@@ -419,15 +485,25 @@ function burstConfetti() {
 
 // ---------- wiring ----------
 
-function setupTabs() {
-  document.querySelectorAll(".tab").forEach((tab) => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-      tab.classList.add("active");
-      $(`#tab-${tab.dataset.tab}`).classList.add("active");
-    });
+function setupNav() {
+  document.querySelectorAll(".nav-item[data-panel]").forEach((item) => {
+    item.addEventListener("click", () => goToPanel(item.dataset.panel, item));
   });
+
+  document.querySelectorAll(".collection-card[data-goto]").forEach((card) => {
+    card.addEventListener("click", () => goToPanel(card.dataset.goto));
+  });
+}
+
+function goToPanel(panelId, navItem) {
+  document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+  $(`#panel-${panelId}`).classList.add("active");
+
+  const target = navItem && !navItem.classList.contains("get-help")
+    ? navItem
+    : document.querySelector(`.nav-item[data-panel="${panelId}"]:not(.get-help)`);
+  document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+  if (target) target.classList.add("active");
 }
 
 function setupForms() {
@@ -467,8 +543,10 @@ function setupForms() {
 
 // ---------- boot ----------
 
-setupTabs();
+pixelifyHeadings();
+setupNav();
 setupForms();
+seedNotifs();
 renderPlayer();
 renderTasks();
 renderStats();
