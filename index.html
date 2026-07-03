@@ -6,33 +6,31 @@
   <title>CampusQuest — Level Up Your Uni Life</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<div class="app">
+<div class="app-frame">
 
   <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar">
-    <div class="logo">
-      <span class="logo-mark">⚡</span>
-      <span class="logo-text">Campus<em>Quest</em></span>
-    </div>
+    <h1 class="logo pixel-alt" data-alt="pink,blue">CampusQuest</h1>
 
     <nav class="side-nav">
-      <button class="nav-item active" data-panel="dashboard"><span class="nav-icon">🏠</span> Dashboard</button>
+      <button class="nav-item active" data-panel="dashboard"><span class="nav-icon">🏠</span> Home</button>
       <button class="nav-item" data-panel="tasks"><span class="nav-icon">✅</span> Tasks</button>
       <button class="nav-item" data-panel="events"><span class="nav-icon">🎪</span> Events</button>
       <button class="nav-item" data-panel="leaderboard"><span class="nav-icon">🏆</span> Leaderboard</button>
       <button class="nav-item" data-panel="resources"><span class="nav-icon">📚</span> Resources</button>
+      <button class="nav-item get-help" data-panel="dashboard" type="button"><span class="nav-icon">❓</span> Get Help</button>
     </nav>
 
-    <div class="side-profile">
-      <span class="side-avatar">🦉</span>
-      <div class="side-profile-info">
+    <div class="profile">
+      <div class="profile-avatar">🦉</div>
+      <div class="profile-info">
         <strong>You</strong>
-        <span id="side-level" class="side-level">Lv 1 · 0 XP</span>
+        <span class="profile-handle" id="side-level">@campusquest · Lv 1</span>
       </div>
       <span class="side-streak" id="side-streak" title="Current streak">🔥 0</span>
     </div>
@@ -43,81 +41,76 @@
 
     <!-- ===== DASHBOARD ===== -->
     <section class="panel active" id="panel-dashboard">
+      <h2 class="pixel-alt page-title" data-alt="pink,blue">Progress Tracking</h2>
 
-      <div class="profile-card">
-        <div class="profile-banner"></div>
-        <div class="profile-body">
-          <div class="profile-avatar">🦉</div>
-          <div class="profile-headline">
-            <div class="profile-name-row">
-              <h2>You</h2>
-              <span class="level-badge" id="dash-level-badge">Lv 1</span>
-              <span class="streak-chip" id="dash-streak">🔥 0 day streak</span>
-            </div>
-            <p class="muted" id="dash-level-hint">0 XP — earn XP by finishing tasks and showing up to events</p>
-          </div>
+      <div class="scene" title="Walk your dino to the trophy by earning XP">
+        <span class="cloud cl1">☁️</span>
+        <span class="cloud cl2">☁️</span>
+        <span class="cloud cl3">☁️</span>
+        <div class="tree t1"><i></i></div>
+        <div class="tree t2"><i></i></div>
+        <div class="tree t3"><i></i></div>
+        <div class="tree t4"><i></i></div>
+        <div class="scene-grass"></div>
+        <div class="scene-track"><div class="scene-track-fill" id="scene-track-fill"></div></div>
+        <div class="dino" id="scene-dino">
+          <span class="dino-emoji">🦕</span>
+          <span class="dino-pct" id="scene-pct">0%</span>
         </div>
-        <div class="funbar-wrap">
-          <div class="funbar" title="XP progress to next level">
-            <div class="funbar-fill" id="dash-xp-fill"></div>
-            <span class="funbar-label" id="dash-xp-label">0 / 100 XP</span>
-          </div>
-          <span class="funbar-next" id="dash-next-level">next: Lv 2</span>
+        <div class="trophy">
+          🏆
+          <span class="scene-level pixel" id="scene-level">Beginner</span>
         </div>
       </div>
 
       <div class="stat-row">
         <div class="stat-card">
-          <span class="stat-icon stat-icon-indigo">📝</span>
-          <span class="stat-num" id="stat-week-tasks">0</span>
-          <span class="stat-label">tasks done this week</span>
+          <span class="stat-icon">📝</span>
+          <span class="stat-label pixel stat-purple">Tasks Done<br>This Week</span>
+          <span class="stat-num pixel" id="stat-week-tasks">0</span>
         </div>
         <div class="stat-card">
-          <span class="stat-icon stat-icon-mint">🎪</span>
-          <span class="stat-num" id="stat-events">0</span>
-          <span class="stat-label">events attended</span>
+          <span class="stat-icon">🎪</span>
+          <span class="stat-label pixel stat-purple">Events<br>Attended</span>
+          <span class="stat-num pixel" id="stat-events">0</span>
         </div>
         <div class="stat-card">
-          <span class="stat-icon stat-icon-flame">🔥</span>
-          <span class="stat-num" id="stat-streak">0</span>
-          <span class="stat-label">day streak</span>
+          <span class="stat-icon">🔥</span>
+          <span class="stat-label pixel stat-purple">Current<br>Streak</span>
+          <span class="stat-num pixel" id="stat-streak">0</span>
         </div>
         <div class="stat-card">
-          <span class="stat-icon stat-icon-gold">⭐</span>
-          <span class="stat-num" id="stat-xp">0</span>
-          <span class="stat-label">total XP</span>
+          <span class="stat-icon">⭐</span>
+          <span class="stat-label pixel stat-pink">Total<br>XP</span>
+          <span class="stat-num pixel" id="stat-xp">0</span>
         </div>
       </div>
 
-      <div class="dash-columns">
-        <div class="dash-block">
-          <h3>Achievements</h3>
-          <div class="achievements-grid" id="achievements-grid"></div>
-        </div>
-        <div class="dash-block">
-          <h3>Quick actions</h3>
-          <div class="quick-actions">
-            <button class="quick-btn quick-indigo" data-goto="tasks">
-              <span class="quick-icon">➕</span>
-              <span><strong>Add a task</strong><small>Assignments, exams, readings…</small></span>
-            </button>
-            <button class="quick-btn quick-mint" data-goto="events">
-              <span class="quick-icon">🎟️</span>
-              <span><strong>Browse events</strong><small>RSVP &amp; check in for +30 XP</small></span>
-            </button>
-          </div>
-          <h3 class="mt">Up next</h3>
-          <div id="upnext-list" class="upnext-list"></div>
-        </div>
+      <h2 class="pixel-alt page-title" data-alt="green,pink">Your Collections</h2>
+
+      <div class="collections">
+        <button class="collection-card" data-goto="tasks">
+          <span class="pixel collection-label">Tasks</span>
+          <span class="collection-icon">✅</span>
+        </button>
+        <button class="collection-card" data-goto="events">
+          <span class="pixel collection-label">Campus Events</span>
+          <span class="collection-icon">🎪</span>
+        </button>
+        <button class="collection-card" data-goto="resources">
+          <span class="pixel collection-label">Resources</span>
+          <span class="collection-icon">📚</span>
+        </button>
       </div>
+
+      <h2 class="pixel-alt page-title mt" data-alt="pink,blue">Achievements</h2>
+      <div class="achievements-grid" id="achievements-grid"></div>
     </section>
 
     <!-- ===== TASKS ===== -->
     <section class="panel" id="panel-tasks">
-      <div class="panel-head">
-        <h2>Task Manager</h2>
-        <p class="muted">Harder tasks pay more: Easy +10 XP · Medium +25 XP · Hard +50 XP</p>
-      </div>
+      <h2 class="pixel-alt page-title" data-alt="pink,blue">Task Manager</h2>
+      <p class="muted center-text">Easy +10 XP · Medium +25 XP · Hard +50 XP. Overdue tasks turn red!</p>
 
       <form id="task-form" class="task-form card">
         <input type="text" id="task-title" placeholder="What do you need to do?" maxlength="90" required />
@@ -149,10 +142,8 @@
 
     <!-- ===== EVENTS ===== -->
     <section class="panel" id="panel-events">
-      <div class="panel-head">
-        <h2>Club Events</h2>
-        <p class="muted">RSVP to save your spot, then check in at the event to earn <strong>+30 XP</strong>. Only clubs can host.</p>
-      </div>
+      <h2 class="pixel-alt page-title" data-alt="pink,blue">Club Events</h2>
+      <p class="muted center-text">RSVP to save your spot, then check in at the event to earn <strong>+30 XP</strong>. Only clubs can host.</p>
 
       <div class="filters">
         <select id="event-club-filter" class="select-chip">
@@ -171,10 +162,8 @@
 
     <!-- ===== LEADERBOARD ===== -->
     <section class="panel" id="panel-leaderboard">
-      <div class="panel-head">
-        <h2>Campus Leaderboard</h2>
-        <p class="muted">🔒 Pokemon Go rules: you see your full stats, everyone else sees just the summary.</p>
-      </div>
+      <h2 class="pixel-alt page-title" data-alt="pink,blue">Leaderboard</h2>
+      <p class="muted center-text">🔒 You see your full stats — everyone else sees just the summary.</p>
 
       <div class="filters">
         <button class="chip period-chip active" data-period="weekly">Weekly</button>
@@ -187,10 +176,8 @@
 
     <!-- ===== RESOURCES ===== -->
     <section class="panel" id="panel-resources">
-      <div class="panel-head">
-        <h2>Resource Library</h2>
-        <p class="muted">Share notes, videos and tools that saved your semester. Upvote the good stuff.</p>
-      </div>
+      <h2 class="pixel-alt page-title" data-alt="pink,blue">Resource Library</h2>
+      <p class="muted center-text">Share notes, videos and tools that saved your semester. Upvote the good stuff.</p>
 
       <form id="resource-form" class="resource-form card">
         <input type="text" id="resource-title" placeholder="Resource name… e.g. Best linear algebra playlist" maxlength="90" required />
@@ -214,13 +201,19 @@
     </section>
 
   </main>
+
+  <!-- ============ NOTIFICATIONS ============ -->
+  <aside class="notif-panel">
+    <h3 class="notif-title">Notification</h3>
+    <div id="notif-list" class="notif-list"></div>
+  </aside>
+
 </div>
 
-<div id="toasts" class="toasts"></div>
 <div id="levelup-overlay" class="levelup-overlay hidden">
   <div class="levelup-card">
     <span class="levelup-emoji">🎉</span>
-    <h2 id="levelup-text">LEVEL UP!</h2>
+    <h2 id="levelup-text" class="pixel">LEVEL UP!</h2>
     <p id="levelup-sub">You reached Lv 2</p>
   </div>
 </div>

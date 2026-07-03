@@ -54,6 +54,12 @@ function levelInfo(xp) {
   return { level, cur, next, pct };
 }
 
+const LEVEL_TITLES = ["Beginner", "Novice", "Achiever", "Scholar", "Expert", "Campus Legend"];
+
+function titleForLevel(level) {
+  return LEVEL_TITLES[Math.min(level - 1, LEVEL_TITLES.length - 1)];
+}
+
 // ---------- static data: clubs, events, achievements, leaderboard ----------
 
 const CLUBS = [
@@ -237,15 +243,13 @@ function checkAchievements() {
 
 function renderProfile() {
   const info = levelInfo(state.totalXp);
-  $("#dash-level-badge").textContent = `Lv ${info.level}`;
-  $("#dash-streak").textContent = `🔥 ${state.streakDays} day streak`;
-  $("#dash-level-hint").textContent =
-    `${state.totalXp} XP total — ${info.next - state.totalXp} XP to Lv ${info.level + 1}`;
-  $("#dash-xp-fill").style.width = `${info.pct}%`;
-  $("#dash-xp-label").textContent = `${state.totalXp - info.cur} / ${info.next - info.cur} XP`;
-  $("#dash-next-level").textContent = `next: Lv ${info.level + 1}`;
-  $("#side-level").textContent = `Lv ${info.level} · ${state.totalXp} XP`;
+  $("#side-level").textContent = `@campusquest · Lv ${info.level}`;
   $("#side-streak").textContent = `🔥 ${state.streakDays}`;
+  $("#scene-pct").textContent = `${info.pct}%`;
+  $("#scene-level").textContent = `Lv ${info.level} ${titleForLevel(info.level)}`;
+  $("#scene-track-fill").style.width = `${info.pct}%`;
+  // dino walks from 4% (start of track) towards ~78% (just before the trophy)
+  $("#scene-dino").style.left = `calc(4% + ${info.pct * 0.74}%)`;
 }
 
 function renderStats() {
@@ -277,42 +281,6 @@ function renderAchievements() {
 
     card.append(icon, name, desc);
     grid.append(card);
-  });
-}
-
-function renderUpNext() {
-  const list = $("#upnext-list");
-  list.innerHTML = "";
-
-  const today = localDateStr();
-  const pending = state.tasks
-    .filter((t) => !t.completed)
-    .sort((a, b) => a.due.localeCompare(b.due))
-    .slice(0, 4);
-
-  if (pending.length === 0) {
-    const done = document.createElement("div");
-    done.className = "upnext";
-    done.textContent = "🎉 Nothing pending — you're all caught up!";
-    list.append(done);
-    return;
-  }
-
-  pending.forEach((t) => {
-    const overdue = t.due < today;
-    const row = document.createElement("div");
-    row.className = `upnext${overdue ? " overdue" : ""}`;
-
-    const icon = document.createElement("span");
-    icon.textContent = CATEGORY_ICONS[t.category] || "📌";
-    const title = document.createElement("span");
-    title.textContent = t.title;
-    const when = document.createElement("span");
-    when.className = "upnext-when";
-    when.textContent = overdue ? `overdue · ${formatDue(t.due)}` : formatDue(t.due);
-
-    row.append(icon, title, when);
-    list.append(row);
   });
 }
 
@@ -601,7 +569,6 @@ function renderAll() {
   renderProfile();
   renderStats();
   renderAchievements();
-  renderUpNext();
   renderTasks();
   renderEvents();
   renderLeaderboard();
@@ -662,14 +629,73 @@ function toggleUpvote(id) {
   renderResources();
 }
 
-// ---------- toasts, level-up, confetti ----------
+// ---------- notifications, level-up, confetti ----------
+
+function pushNotif(color, icon, heading, sub) {
+  const card = document.createElement("div");
+  card.className = `notif notif-${color}`;
+
+  const iconEl = document.createElement("span");
+  iconEl.className = "notif-icon";
+  iconEl.textContent = icon;
+
+  const body = document.createElement("div");
+  body.className = "notif-body";
+  const strong = document.createElement("strong");
+  strong.textContent = heading;
+  body.append(strong);
+  if (sub) {
+    const subEl = document.createElement("span");
+    subEl.className = "notif-sub";
+    subEl.textContent = sub;
+    body.append(subEl);
+  }
+
+  const close = document.createElement("button");
+  close.className = "notif-close";
+  close.textContent = "✕";
+  close.title = "Dismiss";
+  close.addEventListener("click", () => card.remove());
+
+  card.append(iconEl, body, close);
+  $("#notif-list").prepend(card);
+
+  // keep the panel tidy
+  const list = $("#notif-list");
+  while (list.children.length > 8) list.lastElementChild.remove();
+}
 
 function toast(msg) {
-  const el = document.createElement("div");
-  el.className = "toast";
-  el.textContent = msg;
-  $("#toasts").append(el);
-  setTimeout(() => el.remove(), 3200);
+  pushNotif("blue", "⭐", msg, "");
+}
+
+function seedNotifs() {
+  pushNotif("peach", "🤘", "Start Your First Challenge",
+    "You're just one step away! Tick off a task to kickstart your journey.");
+  pushNotif("plain", "📒", "Set Up Your Week",
+    "Add your assignments and deadlines in Tasks for tailored XP.");
+  pushNotif("blue", "🌟", "Good job on reaching your goal today! 🤙", "");
+}
+
+// pixel headings: alternate letter colours
+function pixelifyHeadings() {
+  document.querySelectorAll(".pixel-alt").forEach((el) => {
+    const [a, b] = (el.dataset.alt || "pink,blue").split(",");
+    const text = el.textContent;
+    el.textContent = "";
+    let i = 0;
+    for (const ch of text) {
+      if (ch === " ") {
+        el.append(" ");
+        continue;
+      }
+      const span = document.createElement("span");
+      span.className = i % 2 === 0 ? `alt-${a}` : `alt-${b}`;
+      span.textContent = ch;
+      el.append(span);
+      i++;
+    }
+  });
 }
 
 function showLevelUp(level) {
@@ -823,8 +849,10 @@ function setupForms() {
 
 // ---------- boot ----------
 
+pixelifyHeadings();
 setupNav();
 setupForms();
+seedNotifs();
 renderAll();
 handleDailyLogin();
 checkAchievements();
