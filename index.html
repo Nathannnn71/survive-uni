@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusQuest — Survive Uni, Level Up Together</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🎓</span>
+      <div>
+        <h1>CampusQuest</h1>
+        <p class="tagline">Survive uni. Level up with your friends.</p>
+      </div>
+    </div>
+
+    <div class="player-card" id="player-card">
+      <div class="avatar" id="player-avatar">🦉</div>
+      <div class="player-info">
+        <div class="player-name-row">
+          <strong id="player-name">You</strong>
+          <span class="level-badge" id="player-level-badge">Lv 1</span>
+        </div>
+        <div class="player-title" id="player-title">Fresh Fresher</div>
+        <div class="funbar" title="XP to next level">
+          <div class="funbar-fill" id="player-xp-fill"></div>
+          <span class="funbar-label" id="player-xp-label">0 XP</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="week" role="tab">📅 This Week</button>
+    <button class="tab" data-tab="events" role="tab">🎪 Campus Events</button>
+    <button class="tab" data-tab="leaderboard" role="tab">🏆 Leaderboard</button>
+  </nav>
+
+  <main>
+
+    <!-- ============ THIS WEEK ============ -->
+    <section class="panel active" id="tab-week">
+      <div class="panel-head">
+        <h2>The Week Ahead</h2>
+        <p class="muted">Assignments, classes, deadlines &amp; group tasks. Tick them off, earn XP.</p>
+      </div>
+
+      <form id="task-form" class="task-form">
+        <input type="text" id="task-title" placeholder="e.g. Finish COMP1511 assignment 2…" maxlength="80" required />
+        <select id="task-subject">
+          <option value="COMP1511">COMP1511 · Programming</option>
+          <option value="MATH1131">MATH1131 · Calculus</option>
+          <option value="PSYC1001">PSYC1001 · Psychology</option>
+          <option value="ECON1101">ECON1101 · Microeconomics</option>
+          <option value="ARTS1090">ARTS1090 · Media</option>
+          <option value="LIFE">Life Admin 🧺</option>
+        </select>
+        <select id="task-type">
+          <option value="assignment">📝 Assignment (+25 XP)</option>
+          <option value="class">🏫 Class (+10 XP)</option>
+          <option value="deadline">⏰ Deadline (+30 XP)</option>
+          <option value="study">📖 Study session (+15 XP)</option>
+          <option value="group">👥 Group task (+20 XP)</option>
+        </select>
+        <select id="task-day"></select>
+        <button type="submit" class="btn btn-primary">+ Add</button>
+      </form>
+
+      <div class="filters">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="todo">To do</button>
+        <button class="chip" data-filter="done">Done ✓</button>
+        <span class="week-progress">
+          <span id="week-progress-text">0 / 0 done this week</span>
+          <span class="mini-funbar"><span class="mini-funbar-fill" id="week-progress-fill"></span></span>
+        </span>
+      </div>
+
+      <div id="task-list" class="task-list"></div>
+      <p class="empty-msg hidden" id="task-empty">Nothing here yet — add your first task and score some XP 🚀</p>
+    </section>
+
+    <!-- ============ EVENTS ============ -->
+    <section class="panel" id="tab-events">
+      <div class="panel-head">
+        <h2>Campus Events</h2>
+        <p class="muted">Join events for <strong>+30 XP</strong>, host your own for <strong>+60 XP</strong>. Your fun bar remembers everything.</p>
+      </div>
+
+      <div class="event-stats">
+        <div class="stat-card">
+          <span class="stat-num" id="stat-joined">0</span>
+          <span class="stat-label">events joined</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="stat-hosted">0</span>
+          <span class="stat-label">events hosted</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="stat-xp">0</span>
+          <span class="stat-label">total XP</span>
+        </div>
+      </div>
+
+      <form id="host-form" class="host-form">
+        <input type="text" id="host-title" placeholder="Host your own event… e.g. Flat 12 exam-cram pizza night 🍕" maxlength="80" required />
+        <button type="submit" class="btn btn-secondary">🎤 Host it (+60 XP)</button>
+      </form>
+
+      <div id="event-list" class="event-list"></div>
+    </section>
+
+    <!-- ============ LEADERBOARD ============ -->
+    <section class="panel" id="tab-leaderboard">
+      <div class="panel-head">
+        <h2>Friend Group Leaderboard</h2>
+        <p class="muted">The fun bar shows each player's progress to their next level — flex your events joined &amp; hosted.</p>
+      </div>
+      <div id="leaderboard" class="leaderboard"></div>
+      <p class="muted small center">Friends' scores are demo data — yours updates live as you complete tasks and events.</p>
+    </section>
+
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <div id="confetti-layer"></div>
+
+  <footer>
+    Made for students who run on caffeine, deadlines and group-chat chaos ☕
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
